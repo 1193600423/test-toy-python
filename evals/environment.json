@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "python": "3.11.15",
+  "uv": "0.11.28",
+  "runtime_dependencies": [],
+  "setup_command": [
+    "uv",
+    "sync",
+    "--locked"
+  ],
+  "build_timeout_seconds": 300,
+  "test_timeout_seconds": 30,
+  "container": {
+    "dockerfile_at_base": "Dockerfile",
+    "base_image": "python:3.11.15-slim",
+    "build_command": [
+      "docker",
+      "build",
+      "-t",
+      "test-toy-python:baseline",
+      "."
+    ],
+    "user": "10001:10001",
+    "network": "none",
+    "cpus": 1,
+    "memory": "256m",
+    "pids_limit": 64,
+    "read_only": true,
+    "tmpfs": "/tmp:rw,noexec,nosuid,size=64m",
+    "identity_policy": "每次运行记录 docker image inspect 的镜像 ID；标签不是不可变身份。"
+  },
+  "failure_policy": {
+    "setup_error": "依赖安装、镜像构建或执行环境不可用；不计为模型修复失败",
+    "test_failure": "pytest exit=1 且 JUnit 有断言失败，属于代码测试失败",
+    "test_error": "收集错误、pytest 错误、零测试或 JUnit 含 errors，不能作为缺陷已复现的证据",
+    "timeout": "单列超时，不推断测试结果"
+  }
+}

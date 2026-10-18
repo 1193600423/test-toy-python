@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "case_id": "pagination",
+  "title": "不满一页的数据没有计入总页数",
+  "split": "development",
+  "origin": "synthetic",
+  "category": "boundary",
+  "repository": {
+    "url": "https://github.com/1193600423/test-toy-python.git",
+    "base_commit": "410270f8f4d96a3973978c9be22f4c0d6b0a84ed"
+  },
+  "issue": {
+    "source": "local_file",
+    "source_path": "issues/002-pagination.md",
+    "snapshot": "issue.md",
+    "sha256": "7214b5e1b515b87bb5c394d0726d4c468dbc00383915e14b9143b059d83deb2e",
+    "github_issue_url": null
+  },
+  "environment": {
+    "spec": "../../environment.json",
+    "python": "3.11.15",
+    "lockfile_sha256": "5732654ce0da8a4d8990df6a74e8663534bd006b492afd6908f7aa29d8d930c7",
+    "setup_timeout_seconds": 300
+  },
+  "reproduction": {
+    "command": [
+      "python",
+      "reproduce.py"
+    ],
+    "cwd": "clean_base_workspace",
+    "script": "reproduce.py",
+    "timeout_seconds": 30,
+    "expected_before_exit_code": 1,
+    "expected_reference_exit_code": 0,
+    "observed_before": "items=(5,); total_pages=2; expected=3"
+  },
+  "verification": {
+    "public_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-p",
+      "no:cacheprovider",
+      "tests"
+    ],
+    "host_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-c",
+      "/dev/null",
+      "--import-mode=importlib",
+      "-p",
+      "no:cacheprovider",
+      "tests",
+      "/verification/test_pagination_hidden.py"
+    ],
+    "timeout_seconds": 30,
+    "expected_before": {
+      "exit_code": 1,
+      "failed": 4,
+      "passed": 23
+    },
+    "expected_reference": {
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 27
+    },
+    "hidden_materials": "host_only"
+  },
+  "acceptance_criteria": [
+    "5 条记录、每页 2 条时总页数为 3，末页为 (5,)",
+    "非空但不足一页计为 1 页",
+    "空输入总页数为 0",
+    "超出范围的页返回空 items，保留真实总页数",
+    "保持页码从 1 开始以及参数校验"
+  ],
+  "constraints": [
+    "保持现有公共 API 和输入校验",
+    "允许添加回归测试，不能删除或弱化已有测试",
+    "独立隐藏测试由宿主提供，不能由 Agent 修改",
+    "每条任务从固定 base commit 单独开始"
+  ],
+  "known_limitations": [
+    "人工构造的开发案例，不代表真实仓库任务分布",
+    "同一基线含三个缺陷；每条任务只验收当前案例和公开回归测试",
+    "参考补丁与隐藏测试不随公开仓库分发"
+  ]
+}

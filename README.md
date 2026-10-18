@@ -26,6 +26,9 @@ src/toy_orders/
   orders.py        订单汇总与运费
 tests/             公开基础测试
 issues/            三条可单独交给 Agent 的问题描述
+evals/cases/       完整案例记录、Issue 快照与最小复现脚本
+evals/environment.json  环境与错误分类约定
+docs/decisions.md  阶段 0 选型与逐项验收状态
 Dockerfile         预装依赖的验证环境
 ```
 
@@ -39,8 +42,17 @@ Dockerfile         预装依赖的验证环境
 修复时应增加针对 Issue 的回归测试，并由宿主进行独立验证。
 三条任务可从相同的固定 base commit 分别开始，每次使用独立工作区，避免前次修改影响后续结果。
 
+完整案例入口见 [evals/cases/README.md](evals/cases/README.md)。固定基线是
+`410270f8f4d96a3973978c9be22f4c0d6b0a84ed`，不使用浮动的 `main`。
+克隆时需要保留历史（浅克隆需先获取该提交）。可检查全部公开案例及基线复现：
+
+```sh
+uv run --no-sync python evals/check_cases.py
+```
+
 参考补丁、隐藏测试和评测日志保存在本仓库以外，由评测端管理，不应挂载到 Agent 工作区。
-仓库 Git 历史不保存参考修复。固定提交、镜像身份与验证结果由外部评测记录保存。
+仓库 Git 历史不保存参考修复；参考修复 commit 在宿主专用 Git 仓库中。
+公开案例保存固定提交与环境构建约定，私有评测记录保存修复 commit、镜像身份和完整验证结果。
 
 ## 容器验证
 

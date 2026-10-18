@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "case_id": "order-quantity",
+  "title": "多件商品的行金额与订单总额都忽略了数量",
+  "split": "development",
+  "origin": "synthetic",
+  "category": "cross_file",
+  "repository": {
+    "url": "https://github.com/1193600423/test-toy-python.git",
+    "base_commit": "410270f8f4d96a3973978c9be22f4c0d6b0a84ed"
+  },
+  "issue": {
+    "source": "local_file",
+    "source_path": "issues/003-order-quantity.md",
+    "snapshot": "issue.md",
+    "sha256": "31a7d2d6e56ac7a32edaf7ef11e7d958dd36a5f355d90d710464b0f9518149a1",
+    "github_issue_url": null
+  },
+  "environment": {
+    "spec": "../../environment.json",
+    "python": "3.11.15",
+    "lockfile_sha256": "5732654ce0da8a4d8990df6a74e8663534bd006b492afd6908f7aa29d8d930c7",
+    "setup_timeout_seconds": 300
+  },
+  "reproduction": {
+    "command": [
+      "python",
+      "reproduce.py"
+    ],
+    "cwd": "clean_base_workspace",
+    "script": "reproduce.py",
+    "timeout_seconds": 30,
+    "expected_before_exit_code": 1,
+    "expected_reference_exit_code": 0,
+    "observed_before": "line=1200; order=1400; expected=3600,3800"
+  },
+  "verification": {
+    "public_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-p",
+      "no:cacheprovider",
+      "tests"
+    ],
+    "host_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-c",
+      "/dev/null",
+      "--import-mode=importlib",
+      "-p",
+      "no:cacheprovider",
+      "tests",
+      "/verification/test_order_quantity_hidden.py"
+    ],
+    "timeout_seconds": 30,
+    "expected_before": {
+      "exit_code": 1,
+      "failed": 4,
+      "passed": 23
+    },
+    "expected_reference": {
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 27
+    },
+    "hidden_materials": "host_only"
+  },
+  "acceptance_criteria": [
+    "1200 分的商品购买 3 件，行金额为 3600 分",
+    "上述商品加运费 200 分，订单总额为 3800 分",
+    "多个商品行各自计入数量，运费仅加一次",
+    "订单汇总以商品行金额属性为唯一来源",
+    "保持默认数量 1、空订单、生成器输入和非法输入校验"
+  ],
+  "constraints": [
+    "保持现有公共 API 和输入校验",
+    "允许添加回归测试，不能删除或弱化已有测试",
+    "独立隐藏测试由宿主提供，不能由 Agent 修改",
+    "每条任务从固定 base commit 单独开始"
+  ],
+  "known_limitations": [
+    "人工构造的开发案例，不代表真实仓库任务分布",
+    "同一基线含三个缺陷；每条任务只验收当前案例和公开回归测试",
+    "参考补丁与隐藏测试不随公开仓库分发"
+  ]
+}

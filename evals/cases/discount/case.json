@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "case_id": "discount",
+  "title": "折扣计算返回的应付金额不正确",
+  "split": "development",
+  "origin": "synthetic",
+  "category": "logic",
+  "repository": {
+    "url": "https://github.com/1193600423/test-toy-python.git",
+    "base_commit": "410270f8f4d96a3973978c9be22f4c0d6b0a84ed"
+  },
+  "issue": {
+    "source": "local_file",
+    "source_path": "issues/001-discount.md",
+    "snapshot": "issue.md",
+    "sha256": "27d98195a7aec6e92242ca26665ffe54fd44fb0cc63364fd1c465b74b69d2548",
+    "github_issue_url": null
+  },
+  "environment": {
+    "spec": "../../environment.json",
+    "python": "3.11.15",
+    "lockfile_sha256": "5732654ce0da8a4d8990df6a74e8663534bd006b492afd6908f7aa29d8d930c7",
+    "setup_timeout_seconds": 300
+  },
+  "reproduction": {
+    "command": [
+      "python",
+      "reproduce.py"
+    ],
+    "cwd": "clean_base_workspace",
+    "script": "reproduce.py",
+    "timeout_seconds": 30,
+    "expected_before_exit_code": 1,
+    "expected_reference_exit_code": 0,
+    "observed_before": "payable=200; expected=800"
+  },
+  "verification": {
+    "public_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-p",
+      "no:cacheprovider",
+      "tests"
+    ],
+    "host_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-c",
+      "/dev/null",
+      "--import-mode=importlib",
+      "-p",
+      "no:cacheprovider",
+      "tests",
+      "/verification/test_discount_hidden.py"
+    ],
+    "timeout_seconds": 30,
+    "expected_before": {
+      "exit_code": 1,
+      "failed": 4,
+      "passed": 22
+    },
+    "expected_reference": {
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 26
+    },
+    "hidden_materials": "host_only"
+  },
+  "acceptance_criteria": [
+    "20% 优惠后应付 800/1000 分",
+    "0% 保持原价，100% 应付 0",
+    "999 分优惠 15% 后向下取整为 849 分",
+    "保持非负整数金额和 0–100 整数百分比的参数校验"
+  ],
+  "constraints": [
+    "保持现有公共 API 和输入校验",
+    "允许添加回归测试，不能删除或弱化已有测试",
+    "独立隐藏测试由宿主提供，不能由 Agent 修改",
+    "每条任务从固定 base commit 单独开始"
+  ],
+  "known_limitations": [
+    "人工构造的开发案例，不代表真实仓库任务分布",
+    "同一基线含三个缺陷；每条任务只验收当前案例和公开回归测试",
+    "参考补丁与隐藏测试不随公开仓库分发"
+  ]
+}
